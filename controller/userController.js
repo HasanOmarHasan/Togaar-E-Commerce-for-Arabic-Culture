@@ -59,9 +59,20 @@ exports.changeUserPassword = asyncHandler(async (req, res, next) => {
     }
   );
   if (!docment) {
-    return next(new ApiError(req.t("http.notFound" , { model: req.t("model.user"), id }), 404));
+    return next(
+      new ApiError(
+        req.t("http.notFound", { model: req.t("model.user"), id }),
+        404
+      )
+    );
   }
-  res.status(200).json({status: req.t("http.success"), message: req.t("http.passwordUpdated"), data: docment });
+  res
+    .status(200)
+    .json({
+      status: req.t("http.success"),
+      message: req.t("http.passwordUpdated"),
+      data: docment,
+    });
 });
 
 // @des     Delete spicefic user by id for ever
@@ -73,7 +84,6 @@ exports.deleteUser = factory.deleteOne(User);
 // @route   Get /api/v1/users/getMe
 // @access  puplic (user)
 exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
-
   req.params.id = req.user._id;
   next();
 });
@@ -95,7 +105,15 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
     }
   );
   if (!docment || docment.isActive === false) {
-    return next(new ApiError(req.t("http.notFound" , { model: req.t("model.user"), id: req.user._id }), 404));
+    return next(
+      new ApiError(
+        req.t("http.notFound", {
+          model: req.t("model.user"),
+          id: req.user._id,
+        }),
+        404
+      )
+    );
   }
   caches.longTermCache_30Days.delete(generateCacheKey("user", req.user._id));
   res.status(200).json({
@@ -127,7 +145,15 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
     }
   );
   if (!docment || docment.isActive === false) {
-    return next(new ApiError(req.t("http.notFound" , { model: req.t("model.user"), id: req.user._id }), 404));
+    return next(
+      new ApiError(
+        req.t("http.notFound", {
+          model: req.t("model.user"),
+          id: req.user._id,
+        }),
+        404
+      )
+    );
   }
   caches.longTermCache_30Days.delete(generateCacheKey("user", req.user._id));
 
@@ -158,7 +184,6 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 // @route   Delete /api/v1/users/deactivate
 // @access  puplic (user)
 exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
-
   const user = await User.findById(req.user._id).select("+password");
 
   if (!user) {
@@ -193,6 +218,7 @@ exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
   });
 
   caches.longTermCache_30Days.delete(generateCacheKey("user", req.user._id));
+  const dynamicUrl = `${req.protocol}://${req.get("host")}`;
 
   const subject = req.t("deactivation.subject");
   const htmlMessage = `
@@ -298,7 +324,7 @@ exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
       </div>
 
       <center>
-        <a href="${process.env.BASE_URL}/login" class="button">
+        <a href="${dynamicUrl}/login" class="button">
           ${req.t("deactivation.button")}
         </a>
       </center>
@@ -338,7 +364,7 @@ ${req.t("deactivation.date")}: ${new Date().toLocaleDateString()}
 ${req.t("deactivation.importantText1").replace(/<[^>]*>?/gm, "")}
 ${req.t("deactivation.importantText2").replace(/<[^>]*>?/gm, "")}
 
-🔗 ${req.t("deactivation.button")}: ${process.env.BASE_URL}/login
+🔗 ${req.t("deactivation.button")}: ${dynamicUrl}/login
 
 ${req.t("deactivation.finalWarning")}
 ${req.t("deactivation.goodbye")}
@@ -486,7 +512,7 @@ exports.ActiveLoggedUserData = asyncHandler(async (req, res, next) => {
       </div>
 
       <center>
-        <a href="${process.env.BASE_URL}/dashboard" class="button">
+        <a href="${dynamicUrl}/dashboard" class="button">
           ${req.t("activation.button")}
         </a>
       </center>
@@ -515,7 +541,7 @@ ${req.t("activation.intro")}
 ${req.t("activation.reactivatedOn")}: ${new Date().toLocaleDateString()}
 ${req.t("activation.status")}: ${req.t("activation.activeStatus")}
 
-🔗 ${req.t("activation.button")}: ${process.env.BASE_URL}/dashboard
+🔗 ${req.t("activation.button")}: ${dynamicUrl}/dashboard
 
 ${req.t("activation.outro1")}
 ${req.t("activation.outro2")}
@@ -564,7 +590,6 @@ exports.changeLanguage = asyncHandler(async (req, res, next) => {
 
   const filteredLangs = supportedLanguages.filter((lang) => lang !== "cimode");
 
-
   if (!filteredLangs.includes(language)) {
     return next(new ApiError(req.t("http.language_not_supported"), 400));
   }
@@ -576,7 +601,6 @@ exports.changeLanguage = asyncHandler(async (req, res, next) => {
   }
 
   await req.i18n.changeLanguage(language);
-
 
   res.cookie("language", language, {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 يوم
