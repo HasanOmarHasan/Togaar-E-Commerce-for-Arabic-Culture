@@ -14,7 +14,6 @@ const dbConnection = require("./config/db");
 const ApiError = require("./utils/ApiError");
 const errorMiddleware = require("./Middleware/errorMiddleware");
 const limiters = require("./Middleware/rateLimitMaddleware");
-// const languageMiddleware = require("./Middleware/languageMiddleware");
 const { i18nextMiddleware } = require("./locales/i18n");
 
 // Socket handler
@@ -35,6 +34,7 @@ const app = express();
 // Connect to database
 dbConnection();
 
+app.set("trust proxy", 1);
 // ========================
 // SOCKET.IO CONFIG
 // ========================
@@ -121,7 +121,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use("/api", limiters.normal);
+app.use("/api/v1/", limiters.normal);
 
 app.use(i18nextMiddleware);
 
@@ -240,11 +240,19 @@ if (isDevelopment) {
 MountRoutes(app);
 
 // ========================
+// HEALTH CHECK
+// ========================
+app.get("/", (req, res) => {
+  res.status(200).json({ status: "ok", env: process.env.NODE_ENV });
+});
+
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+// ========================
 // 404 HANDLER
 // ========================
 
 app.use((req, res, next) => {
-  next(new ApiError(`Cant find this route ${req.originalUrl}`, 400));
+  next(new ApiError(`Cant find this route ${req.originalUrl}`, 404));
 });
 
 // ========================
