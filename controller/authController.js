@@ -193,12 +193,15 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @route   Post /api/v1/auth/refreshToken/
 // @access  public
 exports.refreshToken = asyncHandler(async (req, res, next) => {
-  const refreshToken = req.headers.cookie.split("=")[1];
+  let refreshToken = req.headers.cookie;
+
+  if(refreshToken.includes("refreshToken")) {
+    refreshToken = refreshToken.split("=")[2];
+  }
 
   if (!refreshToken) {
     return next(new ApiError("Refresh token not found", 401));
   }
-
   const user = await verifyToken(refreshToken, req, next, "refreshToken");
 
   const accessToken = generateAccessToken(user);
