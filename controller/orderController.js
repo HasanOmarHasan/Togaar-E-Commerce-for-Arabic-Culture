@@ -1,7 +1,9 @@
 /* eslint-disable no-case-declarations */
 const asyncHandler = require("express-async-handler");
 // eslint-disable-next-line import/no-extraneous-dependencies
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Stripe = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const ApiError = require("../utils/ApiError");
 const facory = require("./handlersFactory");
