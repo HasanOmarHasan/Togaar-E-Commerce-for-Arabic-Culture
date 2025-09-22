@@ -66,7 +66,7 @@ exports.getProducts = factory.getAll(Product, { isProduct: true });
 exports.getProduct = factory.getOne(Product, {
   popOpations: {
     path: "category brand subcategory reviews",
-    select: "name  reviewTitle reviewDescription rating",
+    select: "name  reviewTitle reviewDescription rating helpfulVotes",
   },
 });
 

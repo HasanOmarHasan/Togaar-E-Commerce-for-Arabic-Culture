@@ -29,16 +29,4 @@ exports.updateCoupon = factory.updateOne(Coupon);
 // @access  Privet (Admin)
 exports.deleteCoupon = factory.deleteOne(Coupon);
 
-// @des     protect or validate coupon by id check if such coupon exist and is active and not expired
-exports.couponProtect = asyncHandler(async (req, res, next) => {
-  const id = req.url.split("/")[1];
-  const docment = await Coupon.findOne({
-    _id: id,
-    active: true,
-    expire: { $gt: Date.now() },
-  });
-  if (!docment) {
-    return next(new ApiError(`No coupon form this id  ${id} `, 404));
-  }
-  next();
-});
+

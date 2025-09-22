@@ -14,17 +14,27 @@ const calculateTotalPrice = (cart) => {
 };
 
 // Massage cart
-const massageSuccessCart = (req, res, cart, message) => {
+const massageSuccessCart = (req, res, cart, message, coupon = null) => {
+  const data = {
+    results: cart.products.length,
+    totalPrice: cart.totalPrice,
+    totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
+    cartId: cart._id,
+    products: cart.products,
+  };
+
+  if (coupon) {
+    data.coupon = {
+      id: coupon._id,
+      name: coupon.name,
+      discount: coupon.discount,
+    };
+  }
+
   res.status(200).json({
     status: req.t("http.success"),
     message,
-    data: {
-      results: cart.products.length,
-      totalPrice: cart.totalPrice,
-      totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
-      cartId: cart._id,
-      products: cart.products,
-    },
+    data,
   });
 };
 
@@ -168,25 +178,48 @@ exports.updateProductQuantityInCart = asyncHandler(async (req, res, next) => {
 // @route   Put /api/v1/carts/discount
 // @access  private (User)
 exports.applyDiscount = asyncHandler(async (req, res, next) => {
-  const { coupon } = req.body;
-  const couponCode = await Coupon.findOne({
-    name: coupon,
+  const name = req.body.coupon;
+  const userId = req.user._id;
+
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    return next(new ApiError(`No cart found for user ${userId}`, 404));
+  }
+  if (cart.totalPriceAfterDiscount) {
+    return next(new ApiError("Discount already applied to this cart", 400));
+  }
+
+  const coupon = await Coupon.findOne({
+    name,
     active: true,
     expire: { $gt: Date.now() },
   });
-  if (!couponCode) {
-    return next(new ApiError(`Is not valid or expired ${coupon} `, 404));
+  console.log(coupon);
+
+  if (!coupon) {
+    return next(
+      new ApiError(`${name} Coupon is invalid, expired, or inactive`, 400)
+    );
   }
-  const cart = await Cart.findOne({ user: req.user._id });
-  if (!cart) {
-    return next(new ApiError(`No cart found for user ${req.user._id}`, 404));
+  if (coupon.usedBy.includes(userId)) {
+    return next(new ApiError("You already used this coupon", 400));
   }
-  cart.totalPriceAfterDiscount = (
-    cart.totalPrice -
-    (cart.totalPrice * couponCode.discount) / 100
-  ).toFixed(2);
+
+  if (coupon.usageCount >= coupon.maxUsage) {
+    return next(new ApiError("Coupon usage limit reached", 400));
+  }
+
+  cart.totalPriceAfterDiscount =
+    Math.round(
+      (cart.totalPrice - (cart.totalPrice * coupon.discount) / 100) * 100
+    ) / 100;
 
   await cart.save();
 
-  massageSuccessCart(req, res, cart, req.t("http.success")); // "Coupon applied successfully"
+  // Update coupon usage
+  coupon.usageCount += 1;
+  coupon.usedBy.push(userId);
+  await coupon.save();
+
+  massageSuccessCart(req, res, cart, req.t("http.success"), coupon);
 });

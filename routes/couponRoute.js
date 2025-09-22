@@ -6,7 +6,6 @@ const {
   createCoupon,
   updateCoupon,
   deleteCoupon,
-  couponProtect,
 } = require("../controller/couponController");
 
 const {
@@ -25,7 +24,6 @@ router.use(protect, allowsTo("admin", "manager"));
 router.post("/", createCouponValidator, createCoupon);
 router.get("/", getCoupons);
 
-router.use(couponProtect);
 router.get("/:id", getCouponValidator, getCoupon);
 router.put("/:id", updateCouponValidator, updateCoupon);
 router.delete("/:id", deleteCouponValidator, deleteCoupon);

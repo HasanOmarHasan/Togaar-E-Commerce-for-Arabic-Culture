@@ -44,6 +44,7 @@ exports.createOne = (Model) =>
     const docment = await Model.create(req.body);
 
     caches.mediumTermCache_7Days.delete("products");
+    caches.shortTermCache_20Min.delete(generateCacheKey("product", docment._id));
 
     res.status(201).json({ status: req.t("http.success"), data: docment });
   });
