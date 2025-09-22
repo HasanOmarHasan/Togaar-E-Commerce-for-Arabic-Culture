@@ -1,4 +1,30 @@
-# 🛒 Togaar is E-COMMERCE PLATFORM (Arabic-Centric)
+# 🛒 Togaar is E-COMMERCE PLATFORM (Arabic-Centric) v1.0 
+
+## 📑 Table of Contents
+- [API Documentation](#-api-documentation)
+- [Vision](#-vision)
+- [Business Logic](#-business-logic)
+- [Features](#-features)
+- [Performance Results](#-performance-results)
+- [Security & Protection](#-security--protection)
+- [Tech Stack](#-tech-stack)
+- [The Journey](#-the-journey)
+- [About Me](#-about-me)
+
+
+## API Documentation
+
+### Base URL
+Production: `https://togaar-e-commerce-for-arabic-culture-production.up.railway.app`  
+Development: `http://localhost:3000`
+
+### Postman Collection
+👉 [Open Postman Collection](https://documenter.getpostman.com/view/32860449/2sB3HtFcZn)
+
+
+<!-- [![Run in Postman](https://run.pstmn.io/button.svg)](https://documenter.getpostman.com/view/32860449/2sB3HtFcZn) -->
+[![Run in Postman](https://img.shields.io/badge/Postman-Collection-orange?logo=postman)](https://www.postman.com/your-workspace/collections/your-collection-id)
+
 
 ## 🌍 Vision
 
@@ -90,6 +116,8 @@ I focused heavily on **optimizing performance** to make the platform fast and sc
 - **Account deactivation flow** with reactivation option before permanent deletion.
 - **Validation** for all critical inputs (emails, passwords, product data , ...etc).
 - **Password encryption**: Bcrypt for secure password storage.
+- **Error handling**: Custom error responses for better user experience.
+- **Cors**: Cross-Origin Resource Sharing (CORS) for secure communication between different origins.
 
 ---
 
@@ -103,6 +131,12 @@ I focused heavily on **optimizing performance** to make the platform fast and sc
 - **AI Integration** (Gemini API for chatbot)
 - **i18next** for internationalization and
 - **LRU-cache** for in-memory caching
+
+
+![Node.js](https://img.shields.io/badge/Node.js-20-green?logo=node.js)
+![Express](https://img.shields.io/badge/Express.js-5.x-lightgrey?logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-8.x-brightgreen?logo=mongodb)
+![Stripe](https://img.shields.io/badge/Stripe-Payments-blue?logo=stripe)
 
 ---
 
